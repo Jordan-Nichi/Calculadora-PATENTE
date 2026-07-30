@@ -1,618 +1,349 @@
 <!DOCTYPE html>
-
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Sistema de Gestión Tributaria Automotor</title>
-
+    <title>Sistema de Gestión Tributaria Automotor - Liquidación Total</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <style>
-
         body {
-
             background-color: #f4f7f6;
-
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-
         }
-
         .header {
-
             background-color: #1a4331;
-
             color: white;
-
             padding: 20px 0;
-
             margin-bottom: 30px;
-
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-
         }
-
         .card-custom {
-
             border: none;
-
             border-radius: 10px;
-
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-
         }
-
         .result-card {
-
             background: linear-gradient(135deg, #1a4331 0%, #2d6a4f 100%);
-
             color: white;
-
         }
-
         .form-label {
-
             font-weight: 600;
-
             color: #495057;
-
             font-size: 0.9rem;
-
         }
-
         .btn-calcular {
-
             background-color: #2d6a4f;
-
             color: white;
-
             font-weight: bold;
-
             border: none;
-
             padding: 12px 20px;
-
             font-size: 1.1rem;
-
         }
-
         .btn-calcular:hover {
-
             background-color: #1b4332;
-
             color: white;
-
         }
-
         .total-amount {
-
             font-size: 2.5rem;
-
             font-weight: bold;
-
             text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-
         }
-
         .section-title {
-
             color: #2d6a4f;
-
             font-weight: bold;
-
             border-bottom: 2px solid #e9ecef;
-
             padding-bottom: 5px;
-
             margin-bottom: 15px;
-
         }
-
         .highlight-input {
-
             border: 2px solid #2d6a4f;
-
             background-color: #f8fffb;
-
         }
-
+        .table-dark-custom {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .table-dark-custom th, .table-dark-custom td {
+            color: white;
+            border-color: rgba(255, 255, 255, 0.2);
+        }
     </style>
-
 </head>
-
 <body>
 
-
     <div class="header text-center">
-
-        <h2>Sistema de Cálculo de Patentes y Recargos</h2>
-
-        <p class="mb-0">Módulo de Liquidación Administrativa (Ingreso Manual de Año)</p>
-
+        <h2>Sistema de Cálculo de Patentes - Liquidación Multianual</h2>
+        <p class="mb-0">Calcula deudas históricas año por año (Base de Datos Oficial PDF)</p>
     </div>
-
 
     <div class="container">
-
         <div class="row">
-
             <!-- Formulario -->
-
-            <div class="col-lg-7 mb-4">
-
-                <div class="card card-custom p-4">
-
+            <div class="col-lg-5 mb-4">
+                <div class="card card-custom p-4 h-100">
                     <form id="calcForm">
-
-                       
-
+                        
                         <h5 class="section-title">1. Datos del Vehículo</h5>
-
-                        <div class="row mb-3">
-
-                            <div class="col-md-6">
-
-                                <label for="tipoVehiculo" class="form-label">Tipo de Vehículo</label>
-
-                                <select class="form-select" id="tipoVehiculo" required>
-
-                                    <option value="" selected disabled>Seleccione...</option>
-
-                                    <option value="automovil">Automóvil</option>
-
-                                    <option value="motocicleta">Motocicleta / Ciclomotor</option>
-
-                                    <option value="camioneta">Camioneta / Camión</option>
-
-                                </select>
-
-                            </div>
-
-                            <div class="col-md-6">
-
-                                <label for="anioAuto" class="form-label">Escribí el Año del Vehículo</label>
-
-                                <input type="number" class="form-control highlight-input" id="anioAuto" min="1950" max="2027" placeholder="Ej. 1995" required disabled>
-
-                                <div class="form-text" style="font-size:0.75rem;">Ingresá el año con el teclado.</div>
-
-                            </div>
-
+                        <div class="mb-3">
+                            <label for="tipoVehiculo" class="form-label">Tipo de Vehículo</label>
+                            <select class="form-select" id="tipoVehiculo" required>
+                                <option value="" selected disabled>Seleccione...</option>
+                                <option value="automovil">Automóvil</option>
+                                <option value="motocicleta">Motocicleta / Ciclomotor</option>
+                                <option value="camioneta">Camioneta / Camión</option>
+                            </select>
                         </div>
-
+                        <div class="mb-3">
+                            <label for="anioAuto" class="form-label">Año de Fabricación (Modelo)</label>
+                            <input type="number" class="form-control" id="anioAuto" min="1950" max="2027" placeholder="Ej. 2014" required disabled>
+                        </div>
 
                         <div class="mb-3 d-none" id="divCategoria">
-
                             <label for="categoria" class="form-label">Categoría (Peso / Cilindrada)</label>
-
                             <select class="form-select" id="categoria">
-
                                 <option value="" selected disabled>Seleccione primero el tipo...</option>
-
                             </select>
-
                         </div>
-
-                       
-
-                        <div class="mb-4 d-none" id="divMontoManual">
-
-                            <div class="alert alert-warning p-2" style="font-size: 0.85rem;">
-
-                                <strong>Vehículo antiguo detectado:</strong> Este año no figura en la planilla. Por favor, ingresá el monto base manualmente. El sistema calculará los recargos igual.
-
-                            </div>
-
-                            <label for="montoBaseManual" class="form-label text-primary">Ingreso Manual del Monto Base de Patente ($)</label>
-
+                        
+                        <div class="mb-3 d-none" id="divMontoManual">
+                            <label for="montoBaseManual" class="form-label text-primary">Ingreso Manual del Monto Base ($)</label>
                             <input type="number" class="form-control border-primary" id="montoBaseManual" step="any" placeholder="Ej. 6500">
-
                         </div>
 
-
-                        <h5 class="section-title">2. Fecha de Pago (Para calcular atraso)</h5>
-
+                        <h5 class="section-title mt-4">2. Período a Liquidar</h5>
                         <div class="row mb-3">
+                            <div class="col-6">
+                                <label for="anioDesde" class="form-label">Deuda Desde (Año)</label>
+                                <input type="number" class="form-control highlight-input" id="anioDesde" value="2018" required>
+                                <div class="form-text" style="font-size:0.7rem;">Ej. Si pagó 2017, debe desde 2018.</div>
+                            </div>
+                            <div class="col-6">
+                                <label for="anioHasta" class="form-label">Deuda Hasta (Año)</label>
+                                <input type="number" class="form-control highlight-input" id="anioHasta" value="2026" required>
+                            </div>
+                        </div>
 
-                            <div class="col-md-4">
-
+                        <h5 class="section-title mt-4">3. Fecha de Pago y Tasas</h5>
+                        <div class="row mb-3">
+                            <div class="col-4">
                                 <label for="diaActual" class="form-label">Día</label>
-
                                 <input type="number" class="form-control" id="diaActual" min="1" max="31" required>
-
                             </div>
-
-                            <div class="col-md-4">
-
+                            <div class="col-4">
                                 <label for="mesActual" class="form-label">Mes</label>
-
                                 <input type="number" class="form-control" id="mesActual" min="1" max="12" required>
-
                             </div>
-
-                            <div class="col-md-4">
-
-                                <label for="anioActual" class="form-label">Año de Pago</label>
-
+                            <div class="col-4">
+                                <label for="anioActual" class="form-label">Año</label>
                                 <input type="number" class="form-control" id="anioActual" min="1990" required>
-
                             </div>
-
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="derechoOficina" class="form-label">Derecho de Oficina ($)</label>
+                            <input type="number" class="form-control" id="derechoOficina" value="5000" step="any" required>
                         </div>
 
-                       
-
-                        <div class="mb-4">
-
-                            <label for="mesesAtrasoManual" class="form-label">Meses de atraso computados (Modificable)</label>
-
-                            <input type="number" class="form-control" id="mesesAtrasoManual" min="0" value="0">
-
-                            <div class="form-text" style="font-size:0.75rem;">Se calcula el 1% de recargo por cada mes desde el 30 de Enero del año del auto.</div>
-
-                        </div>
-
-
-                        <h5 class="section-title">3. Tasas Adicionales</h5>
-
-                        <div class="row mb-4">
-
-                            <div class="col-md-12">
-
-                                <label for="derechoOficina" class="form-label">Derecho de Oficina ($)</label>
-
-                                <input type="number" class="form-control" id="derechoOficina" value="5000" step="any" required>
-
-                            </div>
-
-                        </div>
-
-
-                        <button type="submit" class="btn btn-calcular w-100 mt-2">Generar Liquidación</button>
-
+                        <button type="submit" class="btn btn-calcular w-100 mt-2">Calcular Deuda Total</button>
                     </form>
-
                 </div>
-
             </div>
-
 
             <!-- Resultados -->
-
-            <div class="col-lg-5">
-
-                <div class="card card-custom result-card p-4 h-100 d-flex flex-column justify-content-center">
-
-                    <h3 class="mb-4 text-center" style="border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 15px;">Resumen de Liquidación</h3>
-
-                   
-
-                    <div class="d-flex justify-content-between mb-3">
-
-                        <span>Monto Base Patente:</span>
-
-                        <span id="resBase" class="fw-bold fs-5">$ 0.00</span>
-
+            <div class="col-lg-7">
+                <div class="card card-custom result-card p-4 h-100 d-flex flex-column">
+                    <h3 class="mb-3 text-center" style="border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 15px;">Detalle de Liquidación</h3>
+                    
+                    <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                        <table class="table table-sm table-dark-custom text-center align-middle" id="tablaResultados">
+                            <thead>
+                                <tr>
+                                    <th>Año Deuda</th>
+                                    <th>Monto Base</th>
+                                    <th>Meses Mora</th>
+                                    <th>Recargo (1%)</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Filas generadas por JS -->
+                            </tbody>
+                        </table>
                     </div>
-
-                    <div class="d-flex justify-content-between mb-3">
-
-                        <span>Recargo Mora (<span id="resMeses">0</span> meses al 1%):</span>
-
-                        <span id="resRecargo" class="fw-bold fs-5">$ 0.00</span>
-
+                    
+                    <div class="mt-auto pt-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Suma Patentes y Recargos:</span>
+                            <span id="resSubtotal" class="fw-bold fs-5">$ 0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Derecho de Oficina:</span>
+                            <span id="resOficina" class="fw-bold fs-5">$ 0.00</span>
+                        </div>
+                        
+                        <div class="pt-3 text-center" style="border-top: 1px solid rgba(255,255,255,0.3);">
+                            <span class="d-block mb-1 fs-5">TOTAL A ABONAR</span>
+                            <div class="total-amount text-warning" id="resTotal">$ 0.00</div>
+                        </div>
                     </div>
-
-                    <div class="d-flex justify-content-between mb-3">
-
-                        <span>Derecho de Oficina:</span>
-
-                        <span id="resOficina" class="fw-bold fs-5">$ 0.00</span>
-
-                    </div>
-
-                   
-
-                    <div class="mt-4 pt-4 text-center" style="border-top: 1px solid rgba(255,255,255,0.3);">
-
-                        <span class="d-block mb-2 fs-5">TOTAL A ABONAR</span>
-
-                        <div class="total-amount text-warning" id="resTotal">$ 0.00</div>
-
-                    </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
-
     <script>
-
         const tarifario = {"automovil": {"categorias": ["DESDE 850 KG", "DE 851 A 1000", "DE 1001 A 1150", "DE 1151 A 1300", "DE 1301 A 1500", "DE 1501 EN ADELANTE"], "datos": {"2026": [80500.0, 82500.0, 84000.0, 86000.0, 88000.0, 90000.0], "2025": [72000.0, 79800.0, 82400.0, 84000.0, 84200.0, 86000.0], "2024": [65400.0, 80000.0, 80700.0, 71000.0, 81300.0, 84300.0], "2023": [62000.0, 70100.0, 78600.0, 78900.0, 79100.0, 81200.0], "2022": [55000.0, 65900.0, 74000.0, 73900.0, 75100.0, 78900.0], "2021": [45300.0, 53000.0, 71500.0, 72000.0, 72900.0, 75600.0], "2020": [40900.0, 70100.0, 68300.0, 51400.0, 71100.0, 73400.0], "2019": [38900.0, 66000.0, 48900.0, 58500.0, 66300.0, 70300.0], "2018": [36000.0, 62000.0, 58000.0, 48600.0, 64000.0, 69000.0], "2017": [34000.0, 48000.0, 57600.0, 58000.0, 60000.0, 65900.0], "2016": [32000.0, 42900.0, 56000.0, 55100.0, 58000.0, 60300.0], "2015": [30100.0, 41000.0, 55900.0, 54000.0, 57000.0, 59800.0], "2014": [28700.0, 53000.0, 40500.0, 52100.0, 55300.0, 58000.0], "2013": [26400.0, 40100.0, 50300.0, 51400.0, 53000.0, 57100.0], "2012": [23900.0, 50600.0, 48700.0, 40000.0, 52800.0, 54000.0], "2011": [20700.0, 39000.0, 45600.0, 46400.0, 48600.0, 49700.0], "2010": [19700.0, 42700.0, 38700.0, 41500.0, 44900.0, 48300.0], "2009": [18000.0, 40000.0, 35400.0, 39400.0, 32500.0, 45900.0], "2008": [17000.0, 39600.0, 36500.0, 30400.0, 42300.0, 43100.0], "2007": [15600.0, 30000.0, 31000.0, 29700.0, 40000.0, 40300.0], "2006": [14300.0, 30600.0, 27500.0, 28600.0, 31200.0, 39600.0], "2005": [12000.0, 28900.0, 26400.0, 24300.0, 30400.0, 37500.0], "2004": [11000.0, 20900.0, 23700.0, 26400.0, 29700.0, 35600.0], "2003": [10000.0, 19800.0, 21900.0, 23000.0, 24900.0, 34100.0], "2002": [9800.0, 17500.0, 19300.0, 20000.0, 22300.0, 33200.0], "2001": [9100.0, 15900.0, 17300.0, 18900.0, 20400.0, 31400.0], "2000": [8400.0, 13400.0, 15400.0, 17000.0, 19600.0, 30600.0], "1999": [7300.0, 12700.0, 14100.0, 16900.0, 17600.0, 29400.0], "1998": [7100.0, 12000.0, 13500.0, 15400.0, 17000.0, 28000.0]}}, "motocicleta": {"categorias": ["DESDE 50 A 150 CC", "DE 151 A 300 CC", "DE 301 A 500 CC", "DE 501 A 750CC", "DE 750 CC EN ADELANTE"], "datos": {"2026": [35300.0, 40050.0, 45600.0, 50400.0, 55900.0], "2025": [30820.0, 35000.0, 42300.0, 48800.0, 53600.0], "2024": [28600.0, 32000.0, 41200.0, 46300.0, 51700.0], "2023": [24020.0, 30000.0, 40100.0, 45800.0, 50200.0], "2022": [20580.0, 28500.0, 39800.0, 44700.0, 49600.0], "2021": [16540.0, 28000.0, 37500.0, 44000.0, 48700.0], "2020": [14600.0, 27800.0, 36000.0, 43600.0, 48000.0], "2019": [12400.0, 27100.0, 34500.0, 42100.0, 47100.0], "2018": [10600.0, 25210.0, 32600.0, 41300.0, 46700.0], "2017": [10000.0, 23600.0, 30500.0, 40200.0, 46000.0], "2016": [9640.0, 21300.0, 29600.0, 39600.0, 45100.0], "2015": [9400.0, 17600.0, 27800.0, 37500.0, 44300.0], "2014": [9100.0, 15600.0, 26000.0, 36500.0, 42900.0], "2013": [8970.0, 14000.0, 24000.0, 34500.0, 41700.0], "2012": [8880.0, 12300.0, 23000.0, 33100.0, 40900.0], "2011": [8700.0, 11300.0, 21500.0, 31200.0, 39800.0], "2010": [8500.0, 10800.0, 20200.0, 30600.0, 39000.0], "2009": [8420.0, 10100.0, 19800.0, 29800.0, 38100.0], "2008": [8260.0, 10000.0, 17000.0, 27100.0, 37400.0], "2007": [8170.0, 9800.0, 16000.0, 25300.0, 36000.0], "2006": [8100.0, 9600.0, 14800.0, 23600.0, 35200.0], "2005": [8050.0, 9300.0, 13700.0, 21000.0, 34100.0], "2004": [8010.0, 9000.0, 12400.0, 19500.0, 32400.0], "2003": [7800.0, 8900.0, 11900.0, 18500.0, 31900.0], "2002": [7500.0, 8700.0, 11400.0, 17500.0, 30300.0], "2001": [7200.0, 8500.0, 11000.0, 16300.0, 28700.0], "2000": [7100.0, 8100.0, 10700.0, 15400.0, 26100.0]}}, "camioneta": {"categorias": ["DESDE 1500 A 2250 KGS", "DE 2251 A 3500", "DE 3501 A 4500 KGS", "DE 4501A 7000 KGS", "DE 7001 A 10000 KGS", "DE 10001 A 13000 KGS", "DE 13001 A 16000 KGS", "DE 16001 A 20000 KGS", "DE 20001 EN ADELANTE"], "datos": {"2026": [80000.0, 85000.0, 88000.0, 90000.0, 92000.0, 98000.0, 100100.0, 105200.0, 120000.0], "2025": [75600.0, 79600.0, 84500.0, 87500.0, 90100.0, 96300.0, 98600.0, 102300.0, 118000.0], "2024": [60540.0, 77800.0, 80300.0, 84500.0, 86000.0, 92300.0, 96000.0, 101200.0, 117000.0], "2023": [52400.0, 76300.0, 78200.0, 81900.0, 84200.0, 91000.0, 94500.0, 99600.0, 115300.0], "2022": [49600.0, 72500.0, 76500.0, 78600.0, 81000.0, 89600.0, 93600.0, 97800.0, 112400.0], "2021": [45300.0, 70600.0, 73600.0, 76800.0, 79600.0, 86300.0, 91300.0, 96300.0, 110300.0], "2020": [42100.0, 65200.0, 70900.0, 74900.0, 78300.0, 84200.0, 90200.0, 94500.0, 108300.0], "2019": [40100.0, 63500.0, 68100.0, 72300.0, 75400.0, 81200.0, 89000.0, 93600.0, 106200.0], "2018": [38600.0, 60900.0, 67400.0, 69300.0, 74600.0, 79600.0, 87500.0, 91000.0, 104700.0], "2017": [35400.0, 58400.0, 65900.0, 67800.0, 72300.0, 77400.0, 84500.0, 90800.0, 102300.0], "2016": [33100.0, 56700.0, 64300.0, 66900.0, 71500.0, 75200.0, 82600.0, 90100.0, 100400.0], "2015": [31640.0, 53600.0, 63700.0, 65900.0, 69400.0, 73000.0, 81300.0, 89600.0, 99600.0], "2014": [29500.0, 50100.0, 62500.0, 65000.0, 68300.0, 70200.0, 78600.0, 88600.0, 98700.0], "2013": [28700.0, 48900.0, 61300.0, 64900.0, 66900.0, 68900.0, 76200.0, 86900.0, 96300.0], "2012": [26900.0, 45700.0, 58700.0, 63400.0, 64500.0, 67500.0, 74500.0, 84500.0, 94500.0], "2011": [24800.0, 43600.0, 55400.0, 63000.0, 62800.0, 65200.0, 72500.0, 83600.0, 93600.0], "2010": [22700.0, 47000.0, 53600.0, 62900.0, 60300.0, 63900.0, 70100.0, 82100.0, 92500.0], "2009": [20100.0, 42600.0, 51400.0, 61800.0, 58300.0, 61200.0, 68900.0, 81300.0, 91400.0], "2008": [19300.0, 39600.0, 49630.0, 60300.0, 54000.0, 59800.0, 67400.0, 79500.0, 90600.0], "2007": [19100.0, 34500.0, 47500.0, 59800.0, 51300.0, 57800.0, 65000.0, 76300.0, 89700.0], "2006": [18500.0, 31200.0, 45200.0, 59200.0, 48600.0, 54900.0, 63400.0, 74500.0, 88500.0], "2005": [18100.0, 29600.0, 43600.0, 58100.0, 46900.0, 52300.0, 61000.0, 73200.0, 87400.0], "2004": [17800.0, 28300.0, 41000.0, 57300.0, 44700.0, 50300.0, 58600.0, 71000.0, 86000.0], "2003": [17200.0, 26300.0, 38700.0, 55100.0, 42300.0, 46000.0, 57000.0, 68500.0, 84500.0], "2002": [16400.0, 24500.0, 35600.0, 54000.0, 40600.0, 42300.0, 55400.0, 64500.0, 80200.0], "2001": [16200.0, 22600.0, 33400.0, 53400.0, 38000.0, 40900.0, 53000.0, 63200.0, 79600.0], "2000": [16000.0, 21490.0, 31900.0, 51600.0, 35600.0, 38600.0, 51000.0, 60700.0, 77100.0], "1999": [15900.0, 20360.0, 29400.0, 48300.0, 32500.0, 35000.0, 48300.0, 59100.0, 72300.0], "1998": [15700.0, 20100.0, 27000.0, 45300.0, 30000.0, 31000.0, 45300.0, 58400.0, 70300.0]}}};
 
-
         const tipoSelect = document.getElementById('tipoVehiculo');
-
         const anioAutoInput = document.getElementById('anioAuto');
-
         const catSelect = document.getElementById('categoria');
-
         const divCategoria = document.getElementById('divCategoria');
-
         const divMontoManual = document.getElementById('divMontoManual');
-
         const montoBaseManualInput = document.getElementById('montoBaseManual');
-
-       
+        
+        const anioDesdeInput = document.getElementById('anioDesde');
+        const anioHastaInput = document.getElementById('anioHasta');
 
         const diaActualInput = document.getElementById('diaActual');
-
         const mesActualInput = document.getElementById('mesActual');
-
         const anioActualInput = document.getElementById('anioActual');
-
-        const mesesAtrasoManual = document.getElementById('mesesAtrasoManual');
-
         const derechoOficinaInput = document.getElementById('derechoOficina');
-
-       
-
+        
         const form = document.getElementById('calcForm');
-
+        const tbody = document.querySelector('#tablaResultados tbody');
 
         const formatter = new Intl.NumberFormat('es-AR', {
-
             style: 'currency',
-
             currency: 'ARS'
-
         });
 
-
-        // Set current date on load
-
+        // Configurar fecha actual al cargar
         const today = new Date();
-
         diaActualInput.value = today.getDate();
-
         mesActualInput.value = today.getMonth() + 1;
-
         anioActualInput.value = today.getFullYear();
+        anioHastaInput.value = today.getFullYear(); // Default hasta año actual
 
-
-        // Update when vehicle type changes
-
+        // Al cambiar tipo de vehículo
         tipoSelect.addEventListener('change', function() {
-
             const tipo = this.value;
-
-           
-
             if (tipo) {
-
                 anioAutoInput.disabled = false;
-
-               
-
-                // Load Categories for this type
-
                 catSelect.innerHTML = '<option value="" selected disabled>Seleccione categoría...</option>';
-
                 tarifario[tipo].categorias.forEach((cat, index) => {
-
                     catSelect.innerHTML += `<option value="${index}">${cat}</option>`;
-
                 });
-
-               
-
                 verificarAnio();
-
             } else {
-
                 anioAutoInput.disabled = true;
-
                 divCategoria.classList.add('d-none');
-
                 divMontoManual.classList.add('d-none');
-
             }
-
         });
 
-
-        // Check if the typed year exists in our database
-
+        // Verificar si el año de fabricación existe en base
         anioAutoInput.addEventListener('input', verificarAnio);
 
-
         function verificarAnio() {
-
             const tipo = tipoSelect.value;
-
             const anio = anioAutoInput.value;
-
-
-            calcularMesesMora();
-
 
             if (tipo && anio && anio.length === 4) {
-
                 if (tarifario[tipo].datos[anio]) {
-
-                    // Año existe en la tabla
-
                     divCategoria.classList.remove('d-none');
-
                     divMontoManual.classList.add('d-none');
-
                     catSelect.required = true;
-
                     montoBaseManualInput.required = false;
-
                 } else {
-
-                    // Año NO existe (muy viejo o futuro)
-
                     divCategoria.classList.add('d-none');
-
                     divMontoManual.classList.remove('d-none');
-
                     catSelect.required = false;
-
                     montoBaseManualInput.required = true;
-
                 }
-
             } else {
-
                 divCategoria.classList.add('d-none');
-
                 divMontoManual.classList.add('d-none');
-
-                catSelect.required = false;
-
-                montoBaseManualInput.required = false;
-
             }
-
         }
 
-
-        function calcularMesesMora() {
-
-            const anio = parseInt(anioAutoInput.value);
-
-            if (!anio || anio < 1900) return;
-
-
-            const dPago = parseInt(diaActualInput.value) || 1;
-
-            const mPago = parseInt(mesActualInput.value) || 1;
-
-            const aPago = parseInt(anioActualInput.value) || today.getFullYear();
-
-
-            const fechaVencimiento = new Date(anio, 0, 30); // 30 de Enero
-
-            const fechaPago = new Date(aPago, mPago - 1, dPago);
-
-
-            if (fechaPago <= fechaVencimiento) {
-
-                mesesAtrasoManual.value = 0;
-
-            } else {
-
-                let meses = (fechaPago.getFullYear() - fechaVencimiento.getFullYear()) * 12;
-
-                meses -= fechaVencimiento.getMonth();
-
-                meses += fechaPago.getMonth();
-
-               
-
-                if (fechaPago.getDate() <= 30 && meses > 0) {
-
-                    meses--;
-
-                }
-
-               
-
-                mesesAtrasoManual.value = meses > 0 ? meses : 0;
-
-            }
-
-        }
-
-
-        diaActualInput.addEventListener('input', calcularMesesMora);
-
-        mesActualInput.addEventListener('input', calcularMesesMora);
-
-        anioActualInput.addEventListener('input', calcularMesesMora);
-
-
-        // Submit form and show results
-
+        // Al enviar el formulario
         form.addEventListener('submit', function(e) {
-
             e.preventDefault();
-
-           
-
+            
             const tipo = tipoSelect.value;
-
-            const anio = anioAutoInput.value;
-
-            const mesesAtraso = parseInt(mesesAtrasoManual.value) || 0;
-
+            const anioModelo = anioAutoInput.value;
+            const desde = parseInt(anioDesdeInput.value);
+            const hasta = parseInt(anioHastaInput.value);
             const derechoOficina = parseFloat(derechoOficinaInput.value) || 0;
+            
+            if (desde > hasta) {
+                alert('El Año "Desde" no puede ser mayor al Año "Hasta".');
+                return;
+            }
 
             let montoBase = 0;
-
-
-            if (tarifario[tipo].datos[anio]) {
-
+            if (tarifario[tipo].datos[anioModelo]) {
                 const catIndex = catSelect.value;
-
                 if (!catIndex) {
-
-                    alert('Por favor seleccioná la categoría del vehículo.');
-
+                    alert('Por favor seleccioná la categoría.');
                     return;
-
                 }
-
-                montoBase = tarifario[tipo].datos[anio][catIndex];
-
+                montoBase = tarifario[tipo].datos[anioModelo][catIndex];
             } else {
-
                 montoBase = parseFloat(montoBaseManualInput.value);
-
-                if (!montoBase || montoBase <= 0) {
-
-                    alert('Por favor ingresá un monto base válido para este vehículo antiguo.');
-
-                    return;
-
-                }
-
             }
 
+            // Fecha de pago
+            const dPago = parseInt(diaActualInput.value) || 1;
+            const mPago = parseInt(mesActualInput.value) || 1;
+            const aPago = parseInt(anioActualInput.value) || today.getFullYear();
+            const fechaPago = new Date(aPago, mPago - 1, dPago);
 
-            const recargoMonto = montoBase * 0.01 * mesesAtraso;
+            tbody.innerHTML = '';
+            let sumaSubtotales = 0;
 
-            const total = montoBase + recargoMonto + derechoOficina;
+            // Bucle por cada año de deuda
+            for (let anioDeuda = desde; anioDeuda <= hasta; anioDeuda++) {
+                const fechaVencimiento = new Date(anioDeuda, 0, 30); // 30 de Enero del año de deuda
+                
+                let mesesMora = 0;
+                if (fechaPago > fechaVencimiento) {
+                    mesesMora = (fechaPago.getFullYear() - fechaVencimiento.getFullYear()) * 12;
+                    mesesMora -= fechaVencimiento.getMonth(); 
+                    mesesMora += fechaPago.getMonth(); 
+                    
+                    if (fechaPago.getDate() <= 30 && mesesMora > 0) {
+                        mesesMora--; 
+                    }
+                    if (mesesMora < 0) mesesMora = 0;
+                }
 
+                const recargoPorcentaje = 0.01 * mesesMora;
+                const recargoMonto = montoBase * recargoPorcentaje;
+                const subtotalFila = montoBase + recargoMonto;
+                
+                sumaSubtotales += subtotalFila;
 
-            // UI Update
+                // Crear fila en tabla
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="fw-bold">${anioDeuda}</td>
+                    <td>${formatter.format(montoBase)}</td>
+                    <td>${mesesMora}</td>
+                    <td class="text-danger">+ ${formatter.format(recargoMonto)}</td>
+                    <td class="fw-bold">${formatter.format(subtotalFila)}</td>
+                `;
+                tbody.appendChild(tr);
+            }
 
-            document.getElementById('resBase').innerText = formatter.format(montoBase);
+            const totalFinal = sumaSubtotales + derechoOficina;
 
-            document.getElementById('resMeses').innerText = mesesAtraso;
-
-            document.getElementById('resRecargo').innerText = formatter.format(recargoMonto);
-
+            // Actualizar totales UI
+            document.getElementById('resSubtotal').innerText = formatter.format(sumaSubtotales);
             document.getElementById('resOficina').innerText = formatter.format(derechoOficina);
-
-            document.getElementById('resTotal').innerText = formatter.format(total);
-
+            document.getElementById('resTotal').innerText = formatter.format(totalFinal);
         });
-
     </script>
-
 </body>
-
 </html>
-
 
