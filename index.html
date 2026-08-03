@@ -81,7 +81,7 @@
 
     <div class="header text-center">
         <h2>Sistema de Cálculo de Patentes 2026</h2>
-        <p class="mb-0">Autor:Jordan_Nichi</p>
+        <p class="mb-0">Autor: Jordan_Nichi</p>
     </div>
 
     <div class="container">
@@ -180,9 +180,13 @@
                                 <span>Recargo (<span id="txtR1Porcentaje">48</span>%):</span>
                                 <span id="txtR1Recargo">$ 101,760.00</span>
                             </div>
+                            <div class="d-flex justify-content-between text-primary mt-1" style="font-size: 0.9rem;">
+                                <span>Derecho de Oficina:</span>
+                                <span id="txtR1Oficina">$ 5,000.00</span>
+                            </div>
                             <div class="d-flex justify-content-between mt-2 pt-2" style="border-top: 1px solid #eee;">
                                 <span class="fw-bold">Total Recibo 1:</span>
-                                <span class="fw-bold fs-5 text-success" id="txtR1Total">$ 313,760.00</span>
+                                <span class="fw-bold fs-5 text-success" id="txtR1Total">$ 318,760.00</span>
                             </div>
                         </div>
 
@@ -201,20 +205,20 @@
                                 <span>Recargo (<span id="txtR2Porcentaje">7</span>%):</span>
                                 <span id="txtR2Recargo">$ 3,710.00</span>
                             </div>
+                            <div class="d-flex justify-content-between text-primary mt-1" style="font-size: 0.9rem;">
+                                <span>Derecho de Oficina:</span>
+                                <span id="txtR2Oficina">$ 5,000.00</span>
+                            </div>
                             <div class="d-flex justify-content-between mt-2 pt-2" style="border-top: 1px solid #eee;">
                                 <span class="fw-bold">Total Recibo 2:</span>
-                                <span class="fw-bold fs-5 text-success" id="txtR2Total">$ 56,710.00</span>
+                                <span class="fw-bold fs-5 text-success" id="txtR2Total">$ 61,710.00</span>
                             </div>
                         </div>
 
                     </div>
                     
-                    <div class="mt-3 pt-3 text-center" style="border-top: 1px solid rgba(255,255,255,0.3);">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Derecho de Oficina:</span>
-                            <span id="resOficina" class="fw-bold fs-5">$ 5,000.00</span>
-                        </div>
-                        <span class="d-block mb-1 fs-5">TOTAL GENERAL A PAGAR</span>
+                    <div class="mt-3 pt-3 text-center d-none" id="divGranTotal" style="border-top: 1px solid rgba(255,255,255,0.3);">
+                        <span class="d-block mb-1 fs-5">SUMA TOTAL A PAGAR (AMBOS RECIBOS)</span>
                         <div class="total-amount text-warning" id="resTotal">$ 0.00</div>
                     </div>
                 </div>
@@ -318,6 +322,7 @@
 
             let totalR1 = 0;
             let totalR2 = 0;
+            let mostrarTotalGeneral = false;
 
             // --- LÓGICA RECIBO 1 (ATRASADOS) ---
             const anioHastaAtrasado = anioActual - 1; // Ej. 2025
@@ -328,7 +333,9 @@
                 const montoBaseTotalAtrasado = montoBase * cantidadAniosAtrasados; // 53000 * 4 = 212000
                 const mesesMoraTotal = cantidadAniosAtrasados * 12; // 4 * 12 = 48
                 const recargoR1 = montoBaseTotalAtrasado * (mesesMoraTotal / 100); // 212000 * 48% = 101760
-                totalR1 = montoBaseTotalAtrasado + recargoR1; // 313760
+                
+                // Sumamos el derecho de oficina directamente a este recibo
+                totalR1 = montoBaseTotalAtrasado + recargoR1 + derechoOficina; 
 
                 // Mostrar info en UI
                 document.getElementById('txtR1Periodo').innerText = `${desdeAnio} - ${anioHastaAtrasado}`;
@@ -339,8 +346,10 @@
                 document.getElementById('txtR1Meses').innerText = `${mesesMoraTotal} meses`;
                 document.getElementById('txtR1Porcentaje').innerText = mesesMoraTotal;
                 document.getElementById('txtR1Recargo').innerText = formatter.format(recargoR1);
+                document.getElementById('txtR1Oficina').innerText = formatter.format(derechoOficina);
                 document.getElementById('txtR1Total').innerText = formatter.format(totalR1);
                 ticketR1.classList.remove('d-none');
+                mostrarTotalGeneral = true;
             } else {
                 ticketR1.classList.add('d-none');
             }
@@ -350,7 +359,9 @@
             if (cobraActual) {
                 // Meses mora = mes actual directo
                 const recargoR2 = montoBase * (mesActual / 100); // 53000 * 7% = 3710
-                totalR2 = montoBase + recargoR2; // 56710
+                
+                // Sumamos el derecho de oficina también a este recibo
+                totalR2 = montoBase + recargoR2 + derechoOficina; 
 
                 // Mostrar info en UI
                 document.getElementById('txtR2Anio').innerText = anioActual;
@@ -358,17 +369,25 @@
                 document.getElementById('txtR2Meses').innerText = `${mesActual} meses`;
                 document.getElementById('txtR2Porcentaje').innerText = mesActual;
                 document.getElementById('txtR2Recargo').innerText = formatter.format(recargoR2);
+                document.getElementById('txtR2Oficina').innerText = formatter.format(derechoOficina);
                 document.getElementById('txtR2Total').innerText = formatter.format(totalR2);
                 ticketR2.classList.remove('d-none');
+                mostrarTotalGeneral = true;
             } else {
                 ticketR2.classList.add('d-none');
             }
 
-            // --- TOTAL FINAL ---
-            const granTotal = totalR1 + totalR2 + derechoOficina;
-            document.getElementById('resOficina').innerText = formatter.format(derechoOficina);
-            document.getElementById('resTotal').innerText = formatter.format(granTotal);
+            // --- TOTAL GENERAL ---
+            const divGranTotal = document.getElementById('divGranTotal');
+            if (mostrarTotalGeneral && desdeAnio <= anioHastaAtrasado && cobraActual) {
+                 const granTotal = totalR1 + totalR2;
+                 document.getElementById('resTotal').innerText = formatter.format(granTotal);
+                 divGranTotal.classList.remove('d-none');
+            } else {
+                 divGranTotal.classList.add('d-none');
+            }
         });
     </script>
 </body>
 </html>
+
